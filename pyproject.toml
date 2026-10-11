@@ -1,0 +1,25 @@
+[project]
+name = "business-ai-evals"
+version = "0.1.0"
+description = "A small, dependency-free harness for evaluating business LLM tasks."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+evalkit = "evalkit.cli:main"
+
+[tool.setuptools]
+packages = ["evalkit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

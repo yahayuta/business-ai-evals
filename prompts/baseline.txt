@@ -1,0 +1,4 @@
+Classify this customer message for an online shop.
+Return the category, the order ID if there is one, and the sentiment as JSON.
+
+Message: {input}

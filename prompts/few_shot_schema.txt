@@ -1,0 +1,31 @@
+You triage customer support messages for an online shop.
+Reply with a single JSON object and nothing else.
+
+Schema:
+{
+  "category": "order_status" | "cancel_order" | "return_refund" | "address_change" | "product_question" | "payment_issue" | "complaint",
+  "order_id": string matching ORD-<digits>, or null,
+  "sentiment": "positive" | "neutral" | "negative"
+}
+
+Rules:
+1. order_id: write any order number as ORD-<digits> ("#10234" or "order 10234" -> "ORD-10234").
+   If the message contains no order number, use null. Never invent one.
+2. category: choose what the customer wants us to DO next.
+   - Wants to stop an order that has not arrived -> cancel_order (even if they also mention a refund).
+   - Item received and wants a return, exchange, replacement or refund -> return_refund.
+   - Unhappy about service, staff or packaging, with no concrete request -> complaint.
+   - Delivery timing, tracking or shipping questions -> order_status.
+3. sentiment: negative if the customer is frustrated or disappointed, positive if they thank or praise us.
+
+Examples:
+Message: Where is ORD-20001? It was due Monday.
+{"category": "order_status", "order_id": "ORD-20001", "sentiment": "neutral"}
+
+Message: The lamp arrived cracked, I want a refund. Order #20002
+{"category": "return_refund", "order_id": "ORD-20002", "sentiment": "negative"}
+
+Message: Do you ship to Okinawa?
+{"category": "order_status", "order_id": null, "sentiment": "neutral"}
+
+Message: {input}

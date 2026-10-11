@@ -1,0 +1,53 @@
+# Support-ticket triage: route each message to a category, extract the order ID,
+# and read the customer's sentiment. Three prompt strategies are compared.
+
+[eval]
+name = "support-ticket-triage"
+dataset = "datasets/support_tickets.jsonl"
+labels = [
+  "order_status", "cancel_order", "return_refund", "address_change",
+  "product_question", "payment_issue", "complaint",
+]
+
+# --- Variants ---------------------------------------------------------------
+# provider = "replay" re-scores recorded responses (no API key, used in CI).
+# The recorded files are produced by scripts/simulate_runs.py; see README.
+
+[[variants]]
+name = "baseline"
+prompt = "prompts/baseline.txt"
+provider = "replay"
+replay_file = "runs/simulated_baseline.jsonl"
+price = { input_per_mtok = 0.15, output_per_mtok = 0.60 }
+
+[[variants]]
+name = "few_shot"
+prompt = "prompts/few_shot.txt"
+provider = "replay"
+replay_file = "runs/simulated_few_shot.jsonl"
+price = { input_per_mtok = 0.15, output_per_mtok = 0.60 }
+
+[[variants]]
+name = "few_shot_schema"
+prompt = "prompts/few_shot_schema.txt"
+provider = "replay"
+replay_file = "runs/simulated_few_shot_schema.jsonl"
+price = { input_per_mtok = 0.15, output_per_mtok = 0.60 }
+
+# To evaluate a real model, add a variant like this and set the API key:
+#
+# [[variants]]
+# name = "few_shot_schema-live"
+# prompt = "prompts/few_shot_schema.txt"
+# provider = "anthropic"            # or "openai"
+# model = "your-model-id"
+# price = { input_per_mtok = 0.0, output_per_mtok = 0.0 }
+
+# --- Quality gate -----------------------------------------------------------
+# `python -m evalkit check` exits 1 if the release variant falls below these.
+
+[gate]
+variant = "few_shot_schema"
+min_accuracy = 0.85
+min_json_valid = 1.0
+min_field_accuracy = { order_id = 0.95 }
